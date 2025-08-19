@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: catchai-backend
+    container_name: catchai-backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data   # índice Chroma persiste
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: catchai-frontend
+    container_name: catchai-frontend
+    environment:
+      - BACKEND_URL=${BACKEND_URL:-http://host.docker.internal:8000}
+      - PORT=8501
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+    restart: unless-stopped
