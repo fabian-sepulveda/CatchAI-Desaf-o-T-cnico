@@ -42,40 +42,7 @@ Esto levantará los servicios en paralelo:
 
 ## 🏗️ Arquitectura del sistema
 
-flowchart LR
-    subgraph User[👤 Usuario]
-        Browser[🧭 Navegador<br/>http://localhost:8501]
-    end
-
-    subgraph FE[💻 Frontend (Streamlit)]
-        FEEnv[ENV:<br/>BACKEND_URL=http://backend:8000]
-        FEPort[Puerto: 8501]
-    end
-
-    subgraph BE[🧠 Backend (FastAPI)]
-        BEPorts[Puerto: 8000]
-        BEEnv[ENV:<br/>PROVIDER=ollama<br/>OLLAMA_BASE_URL=${OLLAMA_HOST}<br/>OLLAMA_MODEL=mistral<br/>OLLAMA_EMBEDDING_MODEL=nomic-embed-text<br/>CHROMA_BASE_DIR=/app/data/chroma]
-        Chroma[(📦 ChromaDB<br/>/app/data)]
-    end
-
-    subgraph Host[🖥️ Host (tu máquina)]
-        Ollama[🤖 Ollama API<br/>http://localhost:11434]
-        PullJob[📥 ollama-pull (job)]
-    end
-
-    Browser -->|HTTP| FE
-    FE -->|HTTP JSON| BE
-    BE <-->|Embeddings/Query| Chroma
-    BE -->|Chat/Embeddings| Ollama
-    PullJob -.->|ollama pull mistral / emb| Ollama
-
-    classDef box fill:#0ea5e9,stroke:#0c4a6e,color:#fff;
-    classDef db fill:#fde68a,stroke:#92400e,color:#111;
-    class FE,BE,Host box;
-    class Chroma db;
-
-
-
+![Arquitectura del sistema](images/Arquitectura.png)
 
 ### Componentes principales
 - **Frontend (React)** → interfaz web para subir documentos y chatear.  
