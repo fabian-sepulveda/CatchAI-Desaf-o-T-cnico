@@ -1,4 +1,4 @@
-# 🧠 Sistema Conversacional con LLM + RAG
+# 🧠 Sistema Conversacional
 
 Este proyecto implementa un **asistente conversacional** capaz de responder preguntas en lenguaje natural a partir de documentos propios cargados por el usuario.  
 
@@ -136,26 +136,8 @@ Resumen de los documentos proporcionados:
 
 ---
 
-## 🛠️ Desarrollo y contribución
-
-1. Clonar el repositorio  
-2. Instalar dependencias del backend si se quiere probar sin Docker:  
-   ```bash
-   pip install -r backend/requirements.txt
-   ```  
-3. Instalar dependencias del frontend:  
-   ```bash
-   cd frontend
-   npm install
-   ```  
-4. Ejecutar ambos servicios con:  
-   ```bash
-   docker-compose up
-   ```
-
----
 
 ## 📌 Créditos
 
-- **Tecnologías:** FastAPI, React, Docker, ChromaDB, Ollama/OpenAI  
+- **Tecnologías:** FastAPI, Streamlit, Docker, ChromaDB, Ollama/OpenAI  
 
