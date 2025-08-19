@@ -1,6 +1,27 @@
 version: "3.9"
 
 services:
+  # ======================================
+  # 📥 JOB DE PRE-CARGA DE MODELOS OLLAMA
+  # ======================================
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: ollama-pull
+    environment:
+      OLLAMA_HOST: ${OLLAMA_HOST-http://host.docker.internal:11434}
+      # Ahora por defecto traerá mistral + embeddings
+      MODELS: ${OLLAMA_MODELS-mistral nomic-embed-text}
+    entrypoint: ["/bin/sh", "-lc"]
+    command: >
+      'for m in $${MODELS}; do
+         echo ">>> Pulling $$m from $$OLLAMA_HOST";
+         ollama pull $$m || exit 1;
+       done'
+    restart: "no"
+
+  # ======================
+  # 🧠 BACKEND (FastAPI)
+  # ======================
   backend:
     build:
       context: ./backend
@@ -9,12 +30,22 @@ services:
     container_name: catchai-backend
     env_file:
       - .env
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_HOST-http://host.docker.internal:11434}
+      # Modelos por defecto ajustados a mistral
+      OLLAMA_MODEL: ${OLLAMA_MODEL-mistral}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL-nomic-embed-text}
+    depends_on:
+      - ollama-pull
     ports:
       - "8000:8000"
     volumes:
-      - ./backend/data:/app/data   # índice Chroma persiste
+      - ./backend/data:/app/data
     restart: unless-stopped
 
+  # ======================
+  # 💻 FRONTEND (Streamlit)
+  # ======================
   frontend:
     build:
       context: ./frontend
@@ -24,8 +55,11 @@ services:
     environment:
       - BACKEND_URL=${BACKEND_URL:-http://host.docker.internal:8000}
       - PORT=8501
-    ports:
-      - "8501:8501"
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_PORT=8501
     depends_on:
       - backend
+    ports:
+      - "8501:8501"
     restart: unless-stopped
